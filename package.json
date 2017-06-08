@@ -1,13 +1,10 @@
 {
-  "name": "scratch-vm",
+  "name": "CScratch-3d-vm",
   "version": "0.1.0",
-  "description": "Virtual Machine for Scratch 3.0",
-  "author": "Massachusetts Institute of Technology",
-  "license": "BSD-3-Clause",
-  "homepage": "https://github.com/LLK/scratch-vm#readme",
+  "homepage": "https://github.com/CSnap/CScratch-3d-render",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/LLK/scratch-vm.git"
+    "url": "git+ssh://git@github.com/CSnap/CScratch-3d-render.git"
   },
   "main": "./dist/node/scratch-vm.js",
   "scripts": {
@@ -44,7 +41,7 @@
     "promise": "7.1.1",
     "scratch-audio": "^0.1.0-prerelease.0",
     "scratch-blocks": "^0.1.0-prerelease.0",
-    "scratch-render": "^0.1.0-prerelease.0",
+    "scratch-render": "CSnap/CScratch-3d-render/develop",
     "scratch-storage": "^0.2.0",
     "script-loader": "0.7.0",
     "socket.io-client": "1.7.3",

@@ -84,6 +84,9 @@ window.onload = function () {
             insertionMarkerOpacity: 0.3,
             fieldShadow: 'rgba(255, 255, 255, 0.3)',
             dragShadowOpacity: 0.6
+        },
+        toolbox: {
+
         }
     });
     Scratch.workspace = workspace;

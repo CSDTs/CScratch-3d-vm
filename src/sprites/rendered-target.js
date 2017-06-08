@@ -78,11 +78,15 @@ class RenderedTarget extends Target {
          */
         this.y = 0;
 
+        this.z = 0;
+
         /**
          * Scratch direction. Currently should range from -179 to 180.
          * @type {number}
          */
         this.direction = 90;
+
+        this.rotation = [0, 0, 0];
 
         /**
          * Whether the rendered target is draggable on the stage
@@ -101,6 +105,8 @@ class RenderedTarget extends Target {
          * @type {number}
          */
         this.size = 100;
+
+        this.scale = [1, 1, 1];
 
         /**
          * Currently selected costume index.
@@ -200,6 +206,28 @@ class RenderedTarget extends Target {
         this.runtime.requestTargetsUpdate(this);
     }
 
+    setXYZ (x, y, z) {
+        if (this.isStage) return;
+        const oldX = this.x;
+        const oldY = this.y;
+        const oldZ = this.z;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        if (this.renderer) {
+            // const position = this.renderer.getFencedPositionOfDrawable(this.drawableID, [x, y]);
+
+            this.renderer.updateDrawableProperties(this.drawableID, {
+                position: [x, y, z]
+            });
+            if (this.visible) {
+                this.runtime.requestRedraw();
+            }
+        }
+        this.emit(RenderedTarget.EVENT_TARGET_MOVED, this, oldX, oldY);
+        this.runtime.requestTargetsUpdate(this);
+    }
+
     /**
      * Get the rendered direction and scale, after applying rotation style.
      * @return {object<string, number>} Direction and scale to render.
@@ -235,6 +263,26 @@ class RenderedTarget extends Target {
             this.renderer.updateDrawableProperties(this.drawableID, {
                 direction: renderedDirectionScale.direction,
                 scale: renderedDirectionScale.scale
+            });
+            if (this.visible) {
+                this.runtime.requestRedraw();
+            }
+        }
+        this.runtime.requestTargetsUpdate(this);
+    }
+
+    setRotation (x, y, z) {
+        if (this.isStage) {
+            return;
+        }
+
+        this.rotation = [x, y, z].map(n => {
+            return MathUtil.wrapClamp(n, 0, 359);
+        });
+
+        if (this.renderer) {
+            this.renderer.updateDrawableProperties(this.drawableID, {
+                rotation: this.rotation
             });
             if (this.visible) {
                 this.runtime.requestRedraw();
@@ -317,6 +365,24 @@ class RenderedTarget extends Target {
             });
             if (this.visible) {
                 this.runtime.requestRedraw();
+            }
+        }
+    }
+
+    setScale (scale) {
+        if (this.isStage) {
+            return;
+        }
+
+        if (this.renderer) {
+            this.scale = scale.map(n => {
+                return MathUtil.clamp(n, 0, Infinity);
+            });
+            this.renderer.updateDrawableProperties(this.drawableID, {
+                scale: this.scale
+            });
+            if (this.visible) {
+                this.runtime.requstRedraw();
             }
         }
     }
@@ -492,14 +558,13 @@ class RenderedTarget extends Target {
      */
     updateAllDrawableProperties () {
         if (this.renderer) {
-            const renderedDirectionScale = this._getRenderedDirectionAndScale();
             const costume = this.sprite.costumes[this.currentCostume];
             const bitmapResolution = costume.bitmapResolution || 1;
             const props = {
-                position: [this.x, this.y],
-                direction: renderedDirectionScale.direction,
+                position: [this.x, this.y, this.z],
+                direction: this.direction,
                 draggable: this.draggable,
-                scale: renderedDirectionScale.scale,
+                scale: this.scale,
                 visible: this.visible,
                 skinId: costume.skinId,
                 costumeResolution: bitmapResolution,
@@ -721,10 +786,13 @@ class RenderedTarget extends Target {
         // Copy all properties.
         newClone.x = this.x;
         newClone.y = this.y;
+        newClone.z = this.z;
         newClone.direction = this.direction;
+        newClone.rotation = this.rotation;
         newClone.draggable = this.draggable;
         newClone.visible = this.visible;
         newClone.size = this.size;
+        newClone.scale = this.scale;
         newClone.currentCostume = this.currentCostume;
         newClone.rotationStyle = this.rotationStyle;
         newClone.effects = JSON.parse(JSON.stringify(this.effects));
@@ -765,13 +833,19 @@ class RenderedTarget extends Target {
     postSpriteInfo (data) {
         const force = data.hasOwnProperty('force') ? data.force : null;
         if (data.hasOwnProperty('x')) {
-            this.setXY(data.x, this.y, force);
+            this.setXYZ(data.x, this.y, this.z);
         }
         if (data.hasOwnProperty('y')) {
-            this.setXY(this.x, data.y, force);
+            this.setXYZ(this.x, data.y, this.z);
         }
         if (data.hasOwnProperty('direction')) {
             this.setDirection(data.direction);
+        }
+        if (data.hasOwnProperty('rotation')) {
+            this.setRotation(data.rotation);
+        }
+        if (data.hasOwnProperty('scale')) {
+            this.setScale(data.scale);
         }
         if (data.hasOwnProperty('draggable')) {
             this.setDraggable(data.draggable);
@@ -811,8 +885,11 @@ class RenderedTarget extends Target {
             isStage: this.isStage,
             x: this.x,
             y: this.y,
+            z: this.z,
             size: this.size,
+            scale: this.scale,
             direction: this.direction,
+            rotation: this.rotation,
             draggable: this.draggable,
             currentCostume: this.currentCostume,
             costume: costumes[this.currentCostume],
