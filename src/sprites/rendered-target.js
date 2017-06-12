@@ -382,7 +382,7 @@ class RenderedTarget extends Target {
                 scale: this.scale
             });
             if (this.visible) {
-                this.runtime.requstRedraw();
+                this.runtime.requestRedraw();
             }
         }
     }

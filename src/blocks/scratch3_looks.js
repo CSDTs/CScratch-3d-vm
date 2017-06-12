@@ -26,14 +26,7 @@ class Scratch3LooksBlocks {
             looks_switchbackdroptoandwait: this.switchBackdropAndWait,
             looks_nextcostume: this.nextCostume,
             looks_nextbackdrop: this.nextBackdrop,
-            looks_changeeffectby: this.changeEffect,
-            looks_seteffectto: this.setEffect,
-            looks_cleargraphiceffects: this.clearEffects,
-            looks_changesizeby: this.changeSize,
-            looks_setsizeto: this.setSize,
-            looks_gotofront: this.goToFront,
-            looks_gobacklayers: this.goBackLayers,
-            looks_size: this.getSize,
+            looks_setscaleto: this.setScale,
             looks_costumeorder: this.getCostumeIndex,
             looks_backdroporder: this.getBackdropIndex,
             looks_backdropname: this.getBackdropName
@@ -163,44 +156,11 @@ class Scratch3LooksBlocks {
         );
     }
 
-    changeEffect (args, util) {
-        const effect = Cast.toString(args.EFFECT).toLowerCase();
-        const change = Cast.toNumber(args.CHANGE);
-        if (!util.target.effects.hasOwnProperty(effect)) return;
-        const newValue = change + util.target.effects[effect];
-        util.target.setEffect(effect, newValue);
-    }
-
-    setEffect (args, util) {
-        const effect = Cast.toString(args.EFFECT).toLowerCase();
-        const value = Cast.toNumber(args.VALUE);
-        util.target.setEffect(effect, value);
-    }
-
-    clearEffects (args, util) {
-        util.target.clearEffects();
-    }
-
-    changeSize (args, util) {
-        const change = Cast.toNumber(args.CHANGE);
-        util.target.setSize(util.target.size + change);
-    }
-
-    setSize (args, util) {
-        const size = Cast.toNumber(args.SIZE);
-        util.target.setSize(size);
-    }
-
-    goToFront (args, util) {
-        util.target.goToFront();
-    }
-
-    goBackLayers (args, util) {
-        util.target.goBackLayers(args.NUM);
-    }
-
-    getSize (args, util) {
-        return Math.round(util.target.size);
+    setScale (args, util) {
+        const x = Cast.toNumber(args.SCALEX);
+        const y = Cast.toNumber(args.SCALEY);
+        const z = Cast.toNumber(args.SCALEZ);
+        util.target.setScale([x, y, z]);
     }
 
     getBackdropIndex () {

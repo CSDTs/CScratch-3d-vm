@@ -41,6 +41,11 @@ const loadCostume = function (md5ext, costume, runtime) {
         return promise.then(() => costume);
     }
 
+
+    costume.skinId = runtime.renderer.create3DSkin(runtime.renderer.shapes.CUBE);
+    return costume;
+
+
     if (assetType === AssetType.ImageVector) {
         promise = promise.then(costumeAsset => {
             costume.skinId = runtime.renderer.createSVGSkin(costumeAsset.decodeText(), rotationCenter);
