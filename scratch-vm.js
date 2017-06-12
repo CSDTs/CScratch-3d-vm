@@ -8797,10 +8797,10 @@ var RenderedTarget = function (_Target) {
                     costumeResolution: bitmapResolution,
                     rotationCenter: [costume.rotationCenterX / bitmapResolution, costume.rotationCenterY / bitmapResolution]
                 };
-                for (var effectName in this.effects) {
+                /*for (const effectName in this.effects) {
                     if (!this.effects.hasOwnProperty(effectName)) continue;
                     props[effectName] = this.effects[effectName];
-                }
+                }*/
                 this.renderer.updateDrawableProperties(this.drawableID, props);
                 if (this.visible) {
                     this.runtime.requestRedraw();
@@ -40761,7 +40761,7 @@ module.exports = {
 	"scripts": {
 		"build": "./node_modules/.bin/webpack --progress --colors --bail",
 		"coverage": "./node_modules/.bin/tap ./test/{unit,integration}/*.js --coverage --coverage-report=lcov",
-		"deploy": "touch playground/.nojekyll && ./node_modules/.bin/gh-pages -t -d playground -m \"Build for $(git log --pretty=format:%H -n1)\"",
+		"deploy": "touch playground/.nojekyll && gh-pages -t -d playground -m \"Build for $(git log --pretty=format:%H -n1)\"",
 		"lint": "./node_modules/.bin/eslint .",
 		"prepublish": "npm run build",
 		"prepublish-watch": "npm run watch",
