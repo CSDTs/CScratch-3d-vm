@@ -573,10 +573,10 @@ class RenderedTarget extends Target {
                     costume.rotationCenterY / bitmapResolution
                 ]
             };
-            for (const effectName in this.effects) {
+            /*for (const effectName in this.effects) {
                 if (!this.effects.hasOwnProperty(effectName)) continue;
                 props[effectName] = this.effects[effectName];
-            }
+            }*/
             this.renderer.updateDrawableProperties(this.drawableID, props);
             if (this.visible) {
                 this.runtime.requestRedraw();
