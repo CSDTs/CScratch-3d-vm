@@ -8104,6 +8104,9 @@ var loadCostume = function loadCostume(md5ext, costume, runtime) {
         });
     }
 
+    costume.skinId = runtime.renderer.create3DSkin(runtime.renderer.shapes.CUBE);
+    return costume;
+
     if (assetType === AssetType.ImageVector) {
         promise = promise.then(function (costumeAsset) {
             costume.skinId = runtime.renderer.createSVGSkin(costumeAsset.decodeText(), rotationCenter);
@@ -8585,7 +8588,7 @@ var RenderedTarget = function (_Target) {
                     scale: this.scale
                 });
                 if (this.visible) {
-                    this.runtime.requstRedraw();
+                    this.runtime.requestRedraw();
                 }
             }
         }
@@ -21037,14 +21040,7 @@ var Scratch3LooksBlocks = function () {
                 looks_switchbackdroptoandwait: this.switchBackdropAndWait,
                 looks_nextcostume: this.nextCostume,
                 looks_nextbackdrop: this.nextBackdrop,
-                looks_changeeffectby: this.changeEffect,
-                looks_seteffectto: this.setEffect,
-                looks_cleargraphiceffects: this.clearEffects,
-                looks_changesizeby: this.changeSize,
-                looks_setsizeto: this.setSize,
-                looks_gotofront: this.goToFront,
-                looks_gobacklayers: this.goBackLayers,
-                looks_size: this.getSize,
+                looks_setscaleto: this.setScale,
                 looks_costumeorder: this.getCostumeIndex,
                 looks_backdroporder: this.getBackdropIndex,
                 looks_backdropname: this.getBackdropName
@@ -21176,52 +21172,12 @@ var Scratch3LooksBlocks = function () {
             this._setCostumeOrBackdrop(stage, stage.currentCostume + 1, true);
         }
     }, {
-        key: 'changeEffect',
-        value: function changeEffect(args, util) {
-            var effect = Cast.toString(args.EFFECT).toLowerCase();
-            var change = Cast.toNumber(args.CHANGE);
-            if (!util.target.effects.hasOwnProperty(effect)) return;
-            var newValue = change + util.target.effects[effect];
-            util.target.setEffect(effect, newValue);
-        }
-    }, {
-        key: 'setEffect',
-        value: function setEffect(args, util) {
-            var effect = Cast.toString(args.EFFECT).toLowerCase();
-            var value = Cast.toNumber(args.VALUE);
-            util.target.setEffect(effect, value);
-        }
-    }, {
-        key: 'clearEffects',
-        value: function clearEffects(args, util) {
-            util.target.clearEffects();
-        }
-    }, {
-        key: 'changeSize',
-        value: function changeSize(args, util) {
-            var change = Cast.toNumber(args.CHANGE);
-            util.target.setSize(util.target.size + change);
-        }
-    }, {
-        key: 'setSize',
-        value: function setSize(args, util) {
-            var size = Cast.toNumber(args.SIZE);
-            util.target.setSize(size);
-        }
-    }, {
-        key: 'goToFront',
-        value: function goToFront(args, util) {
-            util.target.goToFront();
-        }
-    }, {
-        key: 'goBackLayers',
-        value: function goBackLayers(args, util) {
-            util.target.goBackLayers(args.NUM);
-        }
-    }, {
-        key: 'getSize',
-        value: function getSize(args, util) {
-            return Math.round(util.target.size);
+        key: 'setScale',
+        value: function setScale(args, util) {
+            var x = Cast.toNumber(args.SCALEX);
+            var y = Cast.toNumber(args.SCALEY);
+            var z = Cast.toNumber(args.SCALEZ);
+            util.target.setScale([x, y, z]);
         }
     }, {
         key: 'getBackdropIndex',
@@ -21283,218 +21239,79 @@ var Scratch3MotionBlocks = function () {
         key: 'getPrimitives',
         value: function getPrimitives() {
             return {
-                motion_movesteps: this.moveSteps,
-                motion_gotoxy: this.goToXY,
-                motion_goto: this.goTo,
-                motion_turnright: this.turnRight,
-                motion_turnleft: this.turnLeft,
-                motion_pointindirection: this.pointInDirection,
-                motion_pointtowards: this.pointTowards,
-                motion_glidesecstoxy: this.glide,
-                motion_ifonedgebounce: this.ifOnEdgeBounce,
-                motion_setrotationstyle: this.setRotationStyle,
+                motion_rotate: this.rotate,
+                motion_setrotation: this.setRotation,
+                motion_gotoxyz: this.goToXYZ,
                 motion_changexby: this.changeX,
                 motion_setx: this.setX,
                 motion_changeyby: this.changeY,
                 motion_sety: this.setY,
+                motion_changezby: this.changeZ,
+                motion_setz: this.setZ,
                 motion_xposition: this.getX,
                 motion_yposition: this.getY,
-                motion_direction: this.getDirection
+                motion_zposition: this.getZ
             };
         }
     }, {
-        key: 'moveSteps',
-        value: function moveSteps(args, util) {
-            var steps = Cast.toNumber(args.STEPS);
-            var radians = MathUtil.degToRad(90 - util.target.direction);
-            var dx = steps * Math.cos(radians);
-            var dy = steps * Math.sin(radians);
-            util.target.setXY(util.target.x + dx, util.target.y + dy);
+        key: 'rotate',
+        value: function rotate(args, util) {
+            var x = Cast.toNumber(args.DEGREESX);
+            var y = Cast.toNumber(args.DEGREESY);
+            var z = Cast.toNumber(args.DEGREESZ);
+            util.target.setRotation(util.target.rotation[0] + x, util.target.rotation[1] + y, util.target.rotation[2] + z);
         }
     }, {
-        key: 'goToXY',
-        value: function goToXY(args, util) {
+        key: 'setRotation',
+        value: function setRotation(args, util) {
+            var x = Cast.toNumber(args.DEGREESX);
+            var y = Cast.toNumber(args.DEGREESY);
+            var z = Cast.toNumber(args.DEGREESZ);
+            util.target.setRotation(x, y, z);
+        }
+    }, {
+        key: 'goToXYZ',
+        value: function goToXYZ(args, util) {
             var x = Cast.toNumber(args.X);
             var y = Cast.toNumber(args.Y);
-            util.target.setXY(x, y);
-        }
-    }, {
-        key: 'goTo',
-        value: function goTo(args, util) {
-            var targetX = 0;
-            var targetY = 0;
-            if (args.TO === '_mouse_') {
-                targetX = util.ioQuery('mouse', 'getX');
-                targetY = util.ioQuery('mouse', 'getY');
-            } else if (args.TO === '_random_') {
-                var stageWidth = this.runtime.constructor.STAGE_WIDTH;
-                var stageHeight = this.runtime.constructor.STAGE_HEIGHT;
-                targetX = Math.round(stageWidth * (Math.random() - 0.5));
-                targetY = Math.round(stageHeight * (Math.random() - 0.5));
-            } else {
-                var goToTarget = this.runtime.getSpriteTargetByName(args.TO);
-                if (!goToTarget) return;
-                targetX = goToTarget.x;
-                targetY = goToTarget.y;
-            }
-            util.target.setXY(targetX, targetY);
-        }
-    }, {
-        key: 'turnRight',
-        value: function turnRight(args, util) {
-            var degrees = Cast.toNumber(args.DEGREES);
-            util.target.setDirection(util.target.direction + degrees);
-        }
-    }, {
-        key: 'turnLeft',
-        value: function turnLeft(args, util) {
-            var degrees = Cast.toNumber(args.DEGREES);
-            util.target.setDirection(util.target.direction - degrees);
-        }
-    }, {
-        key: 'pointInDirection',
-        value: function pointInDirection(args, util) {
-            var direction = Cast.toNumber(args.DIRECTION);
-            util.target.setDirection(direction);
-        }
-    }, {
-        key: 'pointTowards',
-        value: function pointTowards(args, util) {
-            var targetX = 0;
-            var targetY = 0;
-            if (args.TOWARDS === '_mouse_') {
-                targetX = util.ioQuery('mouse', 'getX');
-                targetY = util.ioQuery('mouse', 'getY');
-            } else {
-                var pointTarget = this.runtime.getSpriteTargetByName(args.TOWARDS);
-                if (!pointTarget) return;
-                targetX = pointTarget.x;
-                targetY = pointTarget.y;
-            }
-
-            var dx = targetX - util.target.x;
-            var dy = targetY - util.target.y;
-            var direction = 90 - MathUtil.radToDeg(Math.atan2(dy, dx));
-            util.target.setDirection(direction);
-        }
-    }, {
-        key: 'glide',
-        value: function glide(args, util) {
-            if (!util.stackFrame.timer) {
-                // First time: save data for future use.
-                util.stackFrame.timer = new Timer();
-                util.stackFrame.timer.start();
-                util.stackFrame.duration = Cast.toNumber(args.SECS);
-                util.stackFrame.startX = util.target.x;
-                util.stackFrame.startY = util.target.y;
-                util.stackFrame.endX = Cast.toNumber(args.X);
-                util.stackFrame.endY = Cast.toNumber(args.Y);
-                if (util.stackFrame.duration <= 0) {
-                    // Duration too short to glide.
-                    util.target.setXY(util.stackFrame.endX, util.stackFrame.endY);
-                    return;
-                }
-                util.yield();
-            } else {
-                var timeElapsed = util.stackFrame.timer.timeElapsed();
-                if (timeElapsed < util.stackFrame.duration * 1000) {
-                    // In progress: move to intermediate position.
-                    var frac = timeElapsed / (util.stackFrame.duration * 1000);
-                    var dx = frac * (util.stackFrame.endX - util.stackFrame.startX);
-                    var dy = frac * (util.stackFrame.endY - util.stackFrame.startY);
-                    util.target.setXY(util.stackFrame.startX + dx, util.stackFrame.startY + dy);
-                    util.yield();
-                } else {
-                    // Finished: move to final position.
-                    util.target.setXY(util.stackFrame.endX, util.stackFrame.endY);
-                }
-            }
-        }
-    }, {
-        key: 'ifOnEdgeBounce',
-        value: function ifOnEdgeBounce(args, util) {
-            var bounds = util.target.getBounds();
-            if (!bounds) {
-                return;
-            }
-            // Measure distance to edges.
-            // Values are positive when the sprite is far away,
-            // and clamped to zero when the sprite is beyond.
-            var stageWidth = this.runtime.constructor.STAGE_WIDTH;
-            var stageHeight = this.runtime.constructor.STAGE_HEIGHT;
-            var distLeft = Math.max(0, stageWidth / 2 + bounds.left);
-            var distTop = Math.max(0, stageHeight / 2 - bounds.top);
-            var distRight = Math.max(0, stageWidth / 2 - bounds.right);
-            var distBottom = Math.max(0, stageHeight / 2 + bounds.bottom);
-            // Find the nearest edge.
-            var nearestEdge = '';
-            var minDist = Infinity;
-            if (distLeft < minDist) {
-                minDist = distLeft;
-                nearestEdge = 'left';
-            }
-            if (distTop < minDist) {
-                minDist = distTop;
-                nearestEdge = 'top';
-            }
-            if (distRight < minDist) {
-                minDist = distRight;
-                nearestEdge = 'right';
-            }
-            if (distBottom < minDist) {
-                minDist = distBottom;
-                nearestEdge = 'bottom';
-            }
-            if (minDist > 0) {
-                return; // Not touching any edge.
-            }
-            // Point away from the nearest edge.
-            var radians = MathUtil.degToRad(90 - util.target.direction);
-            var dx = Math.cos(radians);
-            var dy = -Math.sin(radians);
-            if (nearestEdge === 'left') {
-                dx = Math.max(0.2, Math.abs(dx));
-            } else if (nearestEdge === 'top') {
-                dy = Math.max(0.2, Math.abs(dy));
-            } else if (nearestEdge === 'right') {
-                dx = 0 - Math.max(0.2, Math.abs(dx));
-            } else if (nearestEdge === 'bottom') {
-                dy = 0 - Math.max(0.2, Math.abs(dy));
-            }
-            var newDirection = MathUtil.radToDeg(Math.atan2(dy, dx)) + 90;
-            util.target.setDirection(newDirection);
-            // Keep within the stage.
-            var fencedPosition = util.target.keepInFence(util.target.x, util.target.y);
-            util.target.setXY(fencedPosition[0], fencedPosition[1]);
-        }
-    }, {
-        key: 'setRotationStyle',
-        value: function setRotationStyle(args, util) {
-            util.target.setRotationStyle(args.STYLE);
+            var z = Cast.toNumber(args.Z);
+            util.target.setXYZ(x, y, z);
         }
     }, {
         key: 'changeX',
         value: function changeX(args, util) {
             var dx = Cast.toNumber(args.DX);
-            util.target.setXY(util.target.x + dx, util.target.y);
+            util.target.setXYZ(util.target.x + dx, util.target.y, util.target.z);
         }
     }, {
         key: 'setX',
         value: function setX(args, util) {
             var x = Cast.toNumber(args.X);
-            util.target.setXY(x, util.target.y);
+            util.target.setXYZ(x, util.target.y);
         }
     }, {
         key: 'changeY',
         value: function changeY(args, util) {
             var dy = Cast.toNumber(args.DY);
-            util.target.setXY(util.target.x, util.target.y + dy);
+            util.target.setXYZ(util.target.x, util.target.y + dy, util.target.z);
         }
     }, {
         key: 'setY',
         value: function setY(args, util) {
             var y = Cast.toNumber(args.Y);
-            util.target.setXY(util.target.x, y);
+            util.target.setXYZ(util.target.x, y, util.target.z);
+        }
+    }, {
+        key: 'changeZ',
+        value: function changeZ(args, util) {
+            var dz = Cast.toNumber(args.DZ);
+            util.target.setXYZ(util.target.x, util.target.y, util.target.z + dz);
+        }
+    }, {
+        key: 'setZ',
+        value: function setZ(args, util) {
+            var z = Cast.toNumber(args.Z);
+            util.target.setXYZ(util.target.x, util.target.y, z);
         }
     }, {
         key: 'getX',
@@ -21507,9 +21324,9 @@ var Scratch3MotionBlocks = function () {
             return util.target.y;
         }
     }, {
-        key: 'getDirection',
-        value: function getDirection(args, util) {
-            return util.target.direction;
+        key: 'getZ',
+        value: function getZ(args, util) {
+            return util.target.z;
         }
     }]);
 
