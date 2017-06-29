@@ -7,6 +7,7 @@ const sb3 = require('./serialization/sb3');
 const StringUtil = require('./util/string-util');
 
 const loadCostume = require('./import/load-costume.js');
+const load3DCostume = require('./import/load-3d-costume.js');
 const loadSound = require('./import/load-sound.js');
 
 const RESERVED_NAMES = ['_mouse_', '_stage_', '_edge_', '_myself_', '_random_'];
@@ -279,6 +280,15 @@ class VirtualMachine extends EventEmitter {
      */
     addCostume (md5ext, costumeObject) {
         loadCostume(md5ext, costumeObject, this.runtime).then(() => {
+            this.editingTarget.sprite.costumes.push(costumeObject);
+            this.editingTarget.setCostume(
+                this.editingTarget.sprite.costumes.length - 1
+            );
+        });
+    }
+
+    add3DCostume (filePath, costumeObject) {
+        load3DCostume(filePath, costumeObject, this.runtime).then(() => {
             this.editingTarget.sprite.costumes.push(costumeObject);
             this.editingTarget.setCostume(
                 this.editingTarget.sprite.costumes.length - 1
