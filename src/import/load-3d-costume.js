@@ -18,7 +18,6 @@ const load3DCostume = function (filepath, costume, runtime) {
             }
         )
     }).then(costumeAsset => {
-        debugger;
         costume.skinId = runtime.renderer.create3DSkin(JSON.parse(costumeAsset));
         return costume;
     })

@@ -136,11 +136,12 @@ class Scratch3PenBlocks {
      * @param {number} oldY - the previous Y position.
      * @private
      */
-    _onTargetMoved (target, oldX, oldY) {
+    _onTargetMoved (target, oldX, oldY, oldZ) {
         const penSkinId = this._getPenLayerID();
         if (penSkinId >= 0) {
             const penState = this._getPenState(target);
-            this.runtime.renderer.penLine(penSkinId, penState.penAttributes, oldX, oldY, target.x, target.y);
+            this.runtime.renderer.penLine(penSkinId, penState.penAttributes,
+                [oldX, oldY, oldZ], [target.x, target.y, target.z]);
             this.runtime.requestRedraw();
         }
     }
@@ -237,7 +238,7 @@ class Scratch3PenBlocks {
 
         const penSkinId = this._getPenLayerID();
         if (penSkinId >= 0) {
-            this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, target.x, target.y);
+            this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, [target.x, target.y, target.z]);
             this.runtime.requestRedraw();
         }
     }

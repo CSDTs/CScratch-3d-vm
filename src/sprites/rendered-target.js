@@ -224,7 +224,7 @@ class RenderedTarget extends Target {
                 this.runtime.requestRedraw();
             }
         }
-        this.emit(RenderedTarget.EVENT_TARGET_MOVED, this, oldX, oldY);
+        this.emit(RenderedTarget.EVENT_TARGET_MOVED, this, oldX, oldY, oldZ);
         this.runtime.requestTargetsUpdate(this);
     }
 
