@@ -141,7 +141,7 @@ class Scratch3PenBlocks {
         if (penSkinId >= 0) {
             const penState = this._getPenState(target);
             this.runtime.renderer.penLine(penSkinId, penState.penAttributes,
-                [oldX, oldY, oldZ], [target.x, target.y, target.z]);
+                [oldX, oldY, oldZ], target.position);
             this.runtime.requestRedraw();
         }
     }
@@ -193,7 +193,11 @@ class Scratch3PenBlocks {
             pen_changepenshadeby: this.changePenShadeBy,
             pen_setpenshadeto: this.setPenShadeToNumber,
             pen_changepensizeby: this.changePenSizeBy,
-            pen_setpensizeto: this.setPenSizeTo
+            pen_setpensizeto: this.setPenSizeTo,
+            pen_sphere: this.makeSphere,
+            pen_box: this.makeBox,
+            pen_arc: this.makeArc,
+            pen_cylinder: this.makeCylinder,
         };
     }
 
@@ -238,7 +242,7 @@ class Scratch3PenBlocks {
 
         const penSkinId = this._getPenLayerID();
         if (penSkinId >= 0) {
-            this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, [target.x, target.y, target.z]);
+            this.runtime.renderer.penPoint(penSkinId, penState.penAttributes, target.position);
             this.runtime.requestRedraw();
         }
     }
@@ -349,6 +353,59 @@ class Scratch3PenBlocks {
     setPenSizeTo (args, util) {
         const penAttributes = this._getPenState(util.target).penAttributes;
         penAttributes.diameter = this._clampPenSize(Cast.toNumber(args.SIZE));
+    }
+
+    /**
+     *
+     */
+    makeSphere (args, util) {
+        const target = util.target;
+        const penAttributes = this._getPenState(target).penAttributes;
+        const penSkinId = this._getPenLayerID();
+
+        if (penSkinId >= 0) {
+            this.runtime.renderer.penSphere(penSkinId, penAttributes, Cast.toNumber(args.RADIUS), target.position);
+            this.runtime.requestRedraw();
+        }
+    }
+
+    makeBox (args, util) {
+        const target = util.target;
+        const penAttributes = this._getPenState(target).penAttributes;
+        const penSkinId = this._getPenLayerID();
+
+        if (penSkinId >= 0) {
+            const dimensions = [Cast.toNumber(args.WIDTH), Cast.toNumber(args.HEIGHT), Cast.toNumber(args.DEPTH)];
+            const position = target.position;
+            const rotation = target.rotation;
+            this.runtime.renderer.penCube(penSkinId, penAttributes, dimensions, position, rotation);
+        }
+    }
+
+    makeArc (args, util) {
+        const target = util.target;
+        const penAttributes = this._getPenState(target).penAttributes;
+        const penSkinId = this._getPenLayerID();
+
+        if (penSkinId >= 0) {
+            const dimensions = [Cast.toNumber(args.WIDTH), Cast.toNumber(args.HEIGHT)];
+            const position = target.position;
+            const rotation = target.rotation;
+            this.runtime.renderer.penArc(penSkinId, penAttributes, dimensions, position, rotation);
+        }
+    }
+
+    makeCylinder (args, util) {
+        const target = util.target;
+        const penAttributes = this._getPenState(target).penAttributes;
+        const penSkinId = this._getPenLayerID();
+
+        if (penSkinId >= 0) {
+            const dimensions = [Cast.toNumber(args.WIDTH), Cast.toNumber(args.HEIGHT), Cast.toNumber(args.DEPTH)];
+            const position = target.position;
+            const rotation = target.rotation;
+            this.runtime.renderer.penCube(penSkinId, penAttributes, dimensions, position, rotation);
+        }
     }
 }
 

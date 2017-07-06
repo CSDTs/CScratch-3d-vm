@@ -121,6 +121,10 @@ class RenderedTarget extends Target {
         this.rotationStyle = RenderedTarget.ROTATION_STYLE_ALL_AROUND;
     }
 
+    get position () {
+        return [this.x, this.y, this.z];
+    }
+
     /**
      * Create a drawable with the this.renderer.
      */
