@@ -401,10 +401,10 @@ class Scratch3PenBlocks {
         const penSkinId = this._getPenLayerID();
 
         if (penSkinId >= 0) {
-            const dimensions = [Cast.toNumber(args.WIDTH), Cast.toNumber(args.HEIGHT), Cast.toNumber(args.DEPTH)];
+            const dimensions = [Cast.toNumber(args.TOP), Cast.toNumber(args.BOTTOM), Cast.toNumber(args.HEIGHT)];
             const position = target.position;
             const rotation = target.rotation;
-            this.runtime.renderer.penCube(penSkinId, penAttributes, dimensions, position, rotation);
+            this.runtime.renderer.penCylinder(penSkinId, penAttributes, dimensions, position, rotation);
         }
     }
 }
