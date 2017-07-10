@@ -1,4 +1,5 @@
 const Cast = require('../util/cast');
+const MathUtil = require('../util/math-util');
 
 class Scratch3LooksBlocks {
     constructor (runtime) {
@@ -29,7 +30,14 @@ class Scratch3LooksBlocks {
             looks_setscaleto: this.setScale,
             looks_costumeorder: this.getCostumeIndex,
             looks_backdroporder: this.getBackdropIndex,
-            looks_backdropname: this.getBackdropName
+            looks_backdropname: this.getBackdropName,
+            looks_setcamerato: this.setCamera,
+            looks_changecameraxby: this.changeCameraX,
+            looks_changecamerayby: this.changeCameraY,
+            looks_changecamerazby: this.changeCameraZ,
+            looks_turncameraaroundx: this.turnCameraX,
+            looks_turncameraaroundy: this.turnCameraY,
+            looks_turncameraaroundz: this.turnCameraZ
         };
     }
 
@@ -175,6 +183,93 @@ class Scratch3LooksBlocks {
 
     getCostumeIndex (args, util) {
         return util.target.currentCostume + 1;
+    }
+
+    setCamera (args, util) {
+        if (!util.target.isStage) return;
+        this.runtime.renderer.cameraPosition = [
+            Cast.toNumber(args.X),
+            Cast.toNumber(args.Y),
+            Cast.toNumber(args.Z)
+        ];
+    }
+
+    changeCameraX (args, util) {
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const currentPosition = renderer.cameraPosition;
+        renderer.cameraPosition = [
+            currentPosition[0] + Cast.toNumber(args.DX),
+            currentPosition[1],
+            currentPosition[2]
+        ];
+    }
+
+    changeCameraY (args, util) {
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const currentPosition = renderer.cameraPosition;
+        renderer.cameraPosition = [
+            currentPosition[0],
+            currentPosition[1] + Cast.toNumber(args.DY),
+            currentPosition[2]
+        ];
+    }
+
+    changeCameraZ (args, util) {
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const currentPosition = renderer.cameraPosition;
+        renderer.cameraPosition = [
+            currentPosition[0],
+            currentPosition[1],
+            currentPosition[2] + Cast.toNumber(args.DX)
+        ];
+    }
+
+    _rotatePoint (x, y, deg) {
+        const radians = MathUtil.degToRad(deg);
+        const sin = Math.sin(radians);
+        const cos = Math.cos(radians);
+
+        return [x * cos - y * sin, x * sin + y * cos];
+    }
+
+    turnCameraX (args, util) {
+        debugger;
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const position = renderer.cameraPosition;
+        const newCoords = this._rotatePoint(position[1], position[2], Cast.toNumber(args.DEGREES));
+        renderer.cameraPosition = [
+            position[0],
+            newCoords[0],
+            newCoords[1]
+        ];
+    }
+
+    turnCameraY (args, util) {
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const position = renderer.cameraPosition;
+        const newCoords = this._rotatePoint(position[0], position[2], Cast.toNumber(args.DEGREES));
+        renderer.cameraPosition = [
+            newCoords[0],
+            position[1],
+            newCoords[1]
+        ];
+    }
+
+    turnCameraZ (args, util) {
+        if (!util.target.isStage) return;
+        const renderer = this.runtime.renderer;
+        const position = renderer.cameraPosition;
+        const newCoords = this._rotatePoint(position[0], position[1], Cast.toNumber(args.DEGREES));
+        renderer.cameraPosition = [
+            newCoords[0],
+            newCoords[1],
+            position[2]
+        ];
     }
 }
 
