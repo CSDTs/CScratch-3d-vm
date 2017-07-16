@@ -20,7 +20,8 @@ const defaultBlockPackages = {
     scratch3_sound: require('../blocks/scratch3_sound'),
     scratch3_sensing: require('../blocks/scratch3_sensing'),
     scratch3_data: require('../blocks/scratch3_data'),
-    scratch3_procedures: require('../blocks/scratch3_procedures')
+    scratch3_procedures: require('../blocks/scratch3_procedures'),
+    scratch3_wedo2: require('../blocks/scratch3_wedo2')
 };
 
 /**
@@ -968,6 +969,16 @@ class Runtime extends EventEmitter {
     }
 
     /**
+     * Report that a new target has been created, possibly by cloning an existing target.
+     * @param {Target} newTarget - the newly created target.
+     * @param {Target} [sourceTarget] - the target used as a source for the new clone, if any.
+     * @fires Runtime#targetWasCreated
+     */
+    fireTargetWasCreated (newTarget, sourceTarget) {
+        this.emit('targetWasCreated', newTarget, sourceTarget);
+    }
+
+    /**
      * Get a target representing the Scratch stage, if one exists.
      * @return {?Target} The target, if found.
      */
@@ -978,6 +989,14 @@ class Runtime extends EventEmitter {
                 return target;
             }
         }
+    }
+
+    /**
+     * Get the editing target.
+     * @return {?Target} The editing target.
+     */
+    getEditingTarget () {
+        return this._editingTarget;
     }
 
     /**
@@ -1012,5 +1031,13 @@ class Runtime extends EventEmitter {
         }, interval);
     }
 }
+
+/**
+ * Event fired after a new target has been created, possibly by cloning an existing target.
+ *
+ * @event Runtime#targetWasCreated
+ * @param {Target} newTarget - the newly created target.
+ * @param {Target} [sourceTarget] - the target used as a source for the new clone, if any.
+ */
 
 module.exports = Runtime;

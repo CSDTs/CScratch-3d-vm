@@ -181,16 +181,19 @@ class Blocks {
     // ---------------------------------------------------------------------
 
     /**
-     * Create event listener for blocks. Handles validation and serves as a generic
-     * adapter between the blocks and the runtime interface.
-     * @param {Object} e Blockly "block" event
+     * Create event listener for blocks and variables. Handles validation and
+     * serves as a generic adapter between the blocks, variables, and the
+     * runtime interface.
+     * @param {object} e Blockly "block" or "variable" event
      * @param {?Runtime} optRuntime Optional runtime to forward click events to.
      */
-
     blocklyListen (e, optRuntime) {
         // Validate event
         if (typeof e !== 'object') return;
-        if (typeof e.blockId !== 'string') return;
+        if (typeof e.blockId !== 'string' && typeof e.varId !== 'string') {
+            return;
+        }
+        const stage = optRuntime.getTargetForStage();
 
         // UI event: clicked scripts toggle in the runtime.
         if (e.element === 'stackclick') {
@@ -243,6 +246,15 @@ class Blocks {
                 id: e.blockId
             });
             break;
+        case 'var_create':
+            stage.createVariable(e.varId, e.varName);
+            break;
+        case 'var_rename':
+            stage.renameVariable(e.varId, e.newName);
+            break;
+        case 'var_delete':
+            stage.deleteVariable(e.varId);
+            break;
         }
     }
 
@@ -284,7 +296,16 @@ class Blocks {
         case 'field':
             // Update block value
             if (!block.fields[args.name]) return;
-            block.fields[args.name].value = args.value;
+            if (args.name === 'VARIABLE') {
+                // Get variable name using the id in args.value.
+                const variable = optRuntime.getEditingTarget().lookupVariableById(args.value);
+                if (variable) {
+                    block.fields[args.name].value = variable.name;
+                    block.fields[args.name].id = args.value;
+                }
+            } else {
+                block.fields[args.name].value = args.value;
+            }
             break;
         case 'mutation':
             block.mutation = mutationAdapter(args.value);

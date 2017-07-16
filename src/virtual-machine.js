@@ -63,6 +63,7 @@ class VirtualMachine extends EventEmitter {
         this.blockListener = this.blockListener.bind(this);
         this.flyoutBlockListener = this.flyoutBlockListener.bind(this);
         this.monitorBlockListener = this.monitorBlockListener.bind(this);
+        this.variableListener = this.variableListener.bind(this);
     }
 
     /**
@@ -297,6 +298,19 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * Rename a costume on the current editing target.
+     * @param {int} costumeIndex - the index of the costume to be renamed.
+     * @param {string} newName - the desired new name of the costume (will be modified if already in use).
+     */
+    renameCostume (costumeIndex, newName) {
+        const usedNames = this.editingTarget.sprite.costumes
+            .filter((costume, index) => costumeIndex !== index)
+            .map(costume => costume.name);
+        this.editingTarget.sprite.costumes[costumeIndex].name = StringUtil.unusedName(newName, usedNames);
+        this.emitTargetsUpdate();
+    }
+
+    /**
      * Delete a costume from the current editing target.
      * @param {int} costumeIndex - the index of the costume to be removed.
      */
@@ -314,6 +328,19 @@ class VirtualMachine extends EventEmitter {
             this.editingTarget.sprite.sounds.push(soundObject);
             this.emitTargetsUpdate();
         });
+    }
+
+    /**
+     * Rename a sound on the current editing target.
+     * @param {int} soundIndex - the index of the sound to be renamed.
+     * @param {string} newName - the desired new name of the sound (will be modified if already in use).
+     */
+    renameSound (soundIndex, newName) {
+        const usedNames = this.editingTarget.sprite.sounds
+            .filter((sound, index) => soundIndex !== index)
+            .map(sound => sound.name);
+        this.editingTarget.sprite.sounds[soundIndex].name = StringUtil.unusedName(newName, usedNames);
+        this.emitTargetsUpdate();
     }
 
     /**
@@ -374,6 +401,8 @@ class VirtualMachine extends EventEmitter {
      */
     deleteSprite (targetId) {
         const target = this.runtime.getTargetById(targetId);
+        const targetIndexBeforeDelete = this.runtime.targets.map(t => t.id).indexOf(target.id);
+
         if (target) {
             if (!target.isSprite()) {
                 throw new Error('Cannot delete non-sprite targets.');
@@ -389,7 +418,8 @@ class VirtualMachine extends EventEmitter {
                 this.runtime.disposeTarget(sprite.clones[i]);
                 // Ensure editing target is switched if we are deleting it.
                 if (clone === currentEditingTarget) {
-                    this.setEditingTarget(this.runtime.targets[0].id);
+                    const nextTargetIndex = Math.min(this.runtime.targets.length - 1, targetIndexBeforeDelete);
+                    this.setEditingTarget(this.runtime.targets[nextTargetIndex].id);
                 }
             }
             // Sprite object should be deleted by GC.
@@ -454,6 +484,19 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * Handle a Blockly event for the variable map.
+     * @param {!Blockly.Event} e Any Blockly event.
+     */
+    variableListener (e) {
+        // Filter events by type, since blocks only needs to listen to these
+        // var events.
+        if (['var_create', 'var_rename', 'var_delete'].indexOf(e.type) !== -1) {
+            this.runtime.getTargetForStage().blocks.blocklyListen(e,
+                this.runtime);
+        }
+    }
+
+    /**
      * Set an editing target. An editor UI can use this function to switch
      * between editing different targets, sprites, etc.
      * After switching the editing target, the VM may emit updates
@@ -473,6 +516,17 @@ class VirtualMachine extends EventEmitter {
             this.emitTargetsUpdate();
             this.emitWorkspaceUpdate();
             this.runtime.setEditingTarget(target);
+        }
+    }
+
+    /**
+     * Repopulate the workspace with the blocks of the current editingTarget. This
+     * allows us to get around bugs like gui#413.
+     */
+    refreshWorkspace () {
+        if (this.editingTarget) {
+            this.emitWorkspaceUpdate();
+            this.runtime.setEditingTarget(this.editingTarget);
         }
     }
 
@@ -556,15 +610,6 @@ class VirtualMachine extends EventEmitter {
      */
     postSpriteInfo (data) {
         this.editingTarget.postSpriteInfo(data);
-    }
-
-    /**
-     * Create a variable by name.
-     * @todo this only creates global variables by putting them on the stage
-     * @param {string} name The name of the variable
-     */
-    createVariable (name) {
-        this.runtime.getTargetForStage().lookupOrCreateVariable(name);
     }
 }
 
