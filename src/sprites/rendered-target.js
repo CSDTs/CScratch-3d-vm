@@ -46,13 +46,13 @@ class RenderedTarget extends Target {
          * @type {!Object.<string, number>}
          */
         this.effects = {
-            color: 0,
+            /*color: 0,
             fisheye: 0,
             whirl: 0,
             pixelate: 0,
             mosaic: 0,
             brightness: 0,
-            ghost: 0
+            ghost: 0*/
         };
 
         /**
@@ -286,9 +286,13 @@ class RenderedTarget extends Target {
             return MathUtil.wrapClamp(n, 0, 359);
         });
 
+        let rotationInRad = this.rotation.map(n => {
+            return MathUtil.degToRad(n);
+        })
+
         if (this.renderer) {
             this.renderer.updateDrawableProperties(this.drawableID, {
-                rotation: this.rotation
+                rotation: rotationInRad
             });
             if (this.visible) {
                 this.runtime.requestRedraw();

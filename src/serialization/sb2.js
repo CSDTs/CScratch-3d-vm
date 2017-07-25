@@ -156,11 +156,12 @@ const parseScratchObject = function (object, runtime, topLevel) {
             const costume = {
                 name: costumeSource.costumeName,
                 bitmapResolution: costumeSource.bitmapResolution || 1,
-                rotationCenterX: costumeSource.rotationCenterX,
-                rotationCenterY: costumeSource.rotationCenterY,
+                rotationCenterX: costumeSource.rotationCenterX || 0,
+                rotationCenterY: costumeSource.rotationCenterY || 0,
                 skinId: null
             };
-            costumePromises.push(loadCostume(costumeSource.baseLayerMD5, costume, runtime));
+            const md5ext = costumeSource.baseLayerMD5 || costume.name + ".json";
+            costumePromises.push(loadCostume(md5ext, costume, runtime));
         }
     }
     // Sounds from JSON

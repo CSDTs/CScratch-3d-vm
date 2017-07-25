@@ -33,9 +33,9 @@ class Scratch3MotionBlocks {
     }
 
     rotate (args, util) {
-        const x = Cast.toNumber(args.DEGREESX);
-        const y = Cast.toNumber(args.DEGREESY);
-        const z = Cast.toNumber(args.DEGREESZ);
+        const x = MathUtil.degToRad(Cast.toNumber(args.DEGREESX));
+        const y = MathUtil.degToRad(Cast.toNumber(args.DEGREESY));
+        const z = MathUtil.degToRad(Cast.toNumber(args.DEGREESZ));
         util.target.setRotation(
             util.target.rotation[0] + x,
             util.target.rotation[1] + y,

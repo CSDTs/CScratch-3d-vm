@@ -79,7 +79,7 @@ const parseScratchObject = function (object, runtime) {
             costumeSource.dataFormat ||
             (costumeSource.assetType && costumeSource.assetType.runtimeFormat) || // older format
             'png'; // if all else fails, guess that it might be a PNG
-        const costumeMd5 = `${costumeSource.assetId}.${dataFormat}`;
+        const costumeMd5 = `${dataFormat === 'json' ? costumeSource.name : costumeSource.assetId}.${dataFormat}`;
         return loadCostume(costumeMd5, costume, runtime);
     });
     // Sounds from JSON
@@ -127,11 +127,20 @@ const parseScratchObject = function (object, runtime) {
     if (object.hasOwnProperty('y')) {
         target.y = object.y;
     }
+    if (object.hasOwnProperty('z')) {
+        target.y = object.y;
+    }
     if (object.hasOwnProperty('direction')) {
         target.direction = object.direction;
     }
+    if (object.hasOwnProperty('rotation')) {
+        target.rotation = object.rotation;
+    }
     if (object.hasOwnProperty('size')) {
         target.size = object.size;
+    }
+    if (object.hasOwnProperty('scale')) {
+        target.scale = object.scale;
     }
     if (object.hasOwnProperty('visible')) {
         target.visible = object.visible;

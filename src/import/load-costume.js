@@ -1,3 +1,5 @@
+const got = require('got');
+
 const StringUtil = require('../util/string-util');
 const log = require('../util/log');
 
@@ -23,6 +25,33 @@ const loadCostume = function (md5ext, costume, runtime) {
     const idParts = StringUtil.splitFirst(md5ext, '.');
     const md5 = idParts[0];
     const ext = idParts[1].toLowerCase();
+
+    if (ext === 'json') {
+        const filepath = './static/costumes/' + md5ext;
+
+        return new Promise((resolve, reject) => {
+            if (filepath.split('.').pop() !== 'json') {
+                resolve(undefined);
+            }
+            got(filepath).then(
+                response => {
+                    if (response.statusCode === 200) {
+                        resolve(response.body);
+                    } else {
+                        reject(response);
+                    }
+                },
+                error => {
+                    reject(error);
+                }
+            )
+        }).then(costumeAsset => {
+            costume.skinId = runtime.renderer.create3DSkin(JSON.parse(costumeAsset));
+            costume.dataFormat = ext;
+            return costume;
+        })
+    }
+
     const assetType = (ext === 'svg') ? AssetType.ImageVector : AssetType.ImageBitmap;
 
     const rotationCenter = [
