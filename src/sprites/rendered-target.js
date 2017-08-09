@@ -286,13 +286,9 @@ class RenderedTarget extends Target {
             return MathUtil.wrapClamp(n, 0, 359);
         });
 
-        let rotationInRad = this.rotation.map(n => {
-            return MathUtil.degToRad(n);
-        })
-
         if (this.renderer) {
             this.renderer.updateDrawableProperties(this.drawableID, {
-                rotation: rotationInRad
+                rotation: this.rotation
             });
             if (this.visible) {
                 this.runtime.requestRedraw();
